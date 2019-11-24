@@ -1,0 +1,14 @@
+{
+  "name": "nodejs-mongodb-blog",
+  "version": "1.0.0",
+  "description": "membuat blog dengan node express dan database mongodb",
+  "main": "server.js",
+  "repository": "https://github.com/linxcodev/nodejs-mongodb-blog.git",
+  "author": "linxcodev",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "mongodb": "^3.3.4"
+  }
+}
