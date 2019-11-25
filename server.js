@@ -26,7 +26,9 @@ client.connect(err => {
   const db = client.db(dbName);
 
   app.get('/', (req, res) => {
-    res.send('hello world')
+    db.collection("posts").find().sort({_id: -1}).toArray((err, posts) => {
+      res.render("user/home", {posts: posts})
+    })
   })
 
   app.get('/admin/dashboard', (req, res) => {
@@ -38,7 +40,7 @@ client.connect(err => {
   })
 
   app.post('/do-post', (req, res) => {
-    db.collection("posts").insertOne(req.body, (err, doc) => {
+    db.collection("posts").insertOne(req.body, (err, docs) => {
       res.send("posted successfully")
     })
   })
