@@ -53,7 +53,7 @@ client.connect(err => {
   })
 
   app.post("/do-comment", (req, res) => {
-    db.collection("posts").update({_id: ObjectId(req.body.post_id)}, {
+    db.collection("posts").updateOne({_id: ObjectId(req.body.post_id)}, {
       $push: {
         "comments": {
           username: req.body.username,
