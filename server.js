@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
 const assert = require('assert')
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser')
+const ObjectId = require('mongodb').ObjectId
 
 app.use("/static", express.static("static"))
 app.set("view engine", "ejs")
@@ -45,9 +46,28 @@ client.connect(err => {
     })
   })
 
-  client.close()
-})
+  app.get("/posts/:id", (req, res) => {
+    db.collection("posts").findOne({_id: ObjectId(req.params.id)}, (err, post) => {
+      res.render("user/post", {post: post})
+    })
+  })
 
-app.listen(3100, () => {
-  console.log("server run on port 3100");
+  app.post("/do-comment", (req, res) => {
+    db.collection("posts").update({_id: ObjectId(req.body.post_id)}, {
+      $push: {
+        "comments": {
+          username: req.body.username,
+          comment: req.body.comment
+        }
+      }
+    }, (err, docs) => {
+      res.send("post comment successfully")
+    })
+  })
+
+  app.listen(3100, () => {
+    console.log("server run on port 3100");
+  })
+
+  client.close()
 })
