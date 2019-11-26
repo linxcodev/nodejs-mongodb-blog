@@ -1,9 +1,11 @@
-const express = require('express')
-const app = express()
-const MongoClient = require('mongodb').MongoClient
-const assert = require('assert')
-const bodyParser = require('body-parser')
-const ObjectId = require('mongodb').ObjectId
+const express = require('express'),
+      app = express(),
+      MongoClient = require('mongodb').MongoClient,
+      assert = require('assert'),
+      bodyParser = require('body-parser'),
+      ObjectId = require('mongodb').ObjectId,
+      formidable = require('formidable'),
+      fs = require('fs')
 
 app.use("/static", express.static("static"))
 app.set("view engine", "ejs")
@@ -62,6 +64,19 @@ client.connect(err => {
       }
     }, (err, docs) => {
       res.send("post comment successfully")
+    })
+  })
+
+  app.post("/do-upload-image", (req, res) => {
+    let formData = new formidable.IncomingForm()
+
+    formData.parse(req, (err, fields, files) => {
+      let oldPath = files.file.path
+      let newPath = "static/images/" + files.file.name
+
+      fs.rename(oldPath, newPath, err => {
+        res.send("/" + newPath)
+      })
     })
   })
 
