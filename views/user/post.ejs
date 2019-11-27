@@ -21,7 +21,11 @@
       <div class="col-lg-8">
 
         <!-- Preview Image -->
-        <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
+        <% if (post.image) { %>
+          <img class="img-fluid rounded" src="<%= post.image %>" alt="">
+        <% } else { %>
+          <img class="img-fluid rounded" src="http://placehold.it/750x300" alt="">
+        <% } %>
 
         <hr>
 

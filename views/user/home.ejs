@@ -22,7 +22,11 @@
         <div class="row">
           <div class="col-lg-6">
             <a href="#">
-              <img class="img-fluid rounded" src="http://placehold.it/750x300" alt="">
+              <% if (post.image) { %>
+                <img class="img-fluid rounded" src="<%= post.image %>" alt="">
+              <% } else { %>
+                <img class="img-fluid rounded" src="http://placehold.it/750x300" alt="">
+              <% } %>
             </a>
           </div>
           <div class="col-lg-6">
