@@ -5,7 +5,9 @@ const express = require('express'),
       formidable = require('formidable'),
       fs = require('fs'),
       session = require('express-session'),
-      mongoose = require('mongoose')
+      mongoose = require('mongoose'),
+      http = require('http').createServer(app),
+      io = require('socket.io')(http)
 
 app.use(session({
   key: 'admin',
@@ -15,7 +17,7 @@ app.use(session({
   saveUninitialized: true
 }))
 
-app.use("/static", express.static("static"))
+app.use("/static", express.static('static'))
 app.set("view engine", "ejs")
 
 // conf bodyParser
@@ -78,8 +80,11 @@ app.post('/do-post', (req, res) => {
   post.content = req.body.content
   post.image = req.body.image
 
-  post.save((err) => {
-    res.send("posted successfully")
+  post.save((err, doc) => {
+    res.send({
+      text: "posted successfully",
+      _id: doc.id
+    })
   })
 })
 
@@ -115,6 +120,12 @@ app.post("/do-upload-image", (req, res) => {
   })
 })
 
-app.listen(3100, () => {
+io.on('connection', socket => {
+  socket.on("new_post", (formData) => {
+    socket.broadcast.emit("new_post", formData)
+  })
+})
+
+http.listen(3100, () => {
   console.log("server run on port 3100");
 })

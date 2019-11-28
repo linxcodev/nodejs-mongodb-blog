@@ -23,14 +23,21 @@
 
 <script type="text/javascript">
   const doPost = form => {
+    let formData = {
+      title: form.title.value, content: form.content.value, image: imagePath
+    }
+
     $.ajax({
       url: "/do-post",
       method: "post",
-      data: {
-        title: form.title.value, content: form.content.value, image: imagePath
-      },
+      data: formData,
       success: res => {
-        alert(res)
+        alert(res.text)
+
+        formData._id = res._id
+
+        const socket = io()
+        socket.emit("new_post", formData)
       }
     })
 

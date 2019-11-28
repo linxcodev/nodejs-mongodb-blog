@@ -16,38 +16,76 @@
     </ol>
 
     <!-- Blog Post -->
-    <% posts.forEach(post => { %>
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-lg-6">
-            <a href="#">
-              <% if (post.image) { %>
-                <img class="img-fluid rounded" src="<%= post.image %>" alt="">
-              <% } else { %>
-                <img class="img-fluid rounded" src="http://placehold.it/750x300" alt="">
-              <% } %>
-            </a>
+    <div id="posts">
+      <% posts.forEach(post => { %>
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <a href="#">
+                  <% if (post.image) { %>
+                    <img class="img-fluid rounded" src="<%= post.image %>" alt="">
+                  <% } else { %>
+                    <img class="img-fluid rounded" src="http://placehold.it/750x300" alt="">
+                  <% } %>
+                </a>
+              </div>
+              <div class="col-lg-6">
+                <h2 class="card-title">
+                  <%= post.title %>
+                </h2>
+                <p class="card-text">
+                  <%= post.content %>
+                </p>
+                <a href="posts/<%= post._id %>" class="btn btn-primary">Read More &rarr;</a>
+              </div>
+            </div>
           </div>
-          <div class="col-lg-6">
-            <h2 class="card-title">
-              <%= post.title %>
-            </h2>
-            <p class="card-text">
-              <%= post.content %>
-            </p>
-            <a href="posts/<%= post._id %>" class="btn btn-primary">Read More &rarr;</a>
+          <div class="card-footer text-muted">
+            Posted on January 1, 2017 by
+            <a href="#">Start Bootstrap</a>
           </div>
         </div>
-      </div>
-      <div class="card-footer text-muted">
-        Posted on January 1, 2017 by
-        <a href="#">Start Bootstrap</a>
-      </div>
+      <% }) %>
     </div>
-    <% }) %>
 
   </div>
   <!-- /.container -->
+
+  <script type="text/javascript">
+    let socket = io()
+
+    socket.on("new_post", formData => {
+      console.log(formData);
+      console.log("jalan");
+      let imageUri = (formData.image) ? formData.image : "http://placehold.it/750x300"
+      let html = `<div class="card mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">
+              <a href="#">
+                <img class="img-fluid rounded" src="${imageUri}" alt="">
+              </a>
+            </div>
+            <div class="col-lg-6">
+              <h2 class="card-title">
+                ${formData.title}
+              </h2>
+              <p class="card-text">
+                ${formData.content}
+              </p>
+              <a href="posts/${formData._id}" class="btn btn-primary">Read More &rarr;</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-muted">
+          Posted on January 1, 2017 by
+          <a href="#">Start Bootstrap</a>
+        </div>
+      </div>`
+
+      $('#posts').prepend(html)
+    })
+  </script>
 
 <%- include('footer') -%>
