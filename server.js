@@ -103,7 +103,10 @@ app.post("/do-comment", (req, res) => {
       }
     }
   }, (err, docs) => {
-    res.send("post comment successfully")
+    res.send({
+      text: "post comment successfully",
+      _id: docs.id
+    })
   })
 })
 
@@ -123,6 +126,10 @@ app.post("/do-upload-image", (req, res) => {
 io.on('connection', socket => {
   socket.on("new_post", (formData) => {
     socket.broadcast.emit("new_post", formData)
+  })
+
+  socket.on("new_comment", (formData) => {
+    io.emit("new_comment", formData)
   })
 })
 

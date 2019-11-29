@@ -56,8 +56,6 @@
     let socket = io()
 
     socket.on("new_post", formData => {
-      console.log(formData);
-      console.log("jalan");
       let imageUri = (formData.image) ? formData.image : "http://placehold.it/750x300"
       let html = `<div class="card mb-4">
         <div class="card-body">

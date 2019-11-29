@@ -45,7 +45,7 @@
           <h5 class="card-header">Leave a Comment:</h5>
           <div class="card-body">
             <form method="post" onsubmit="return doComment(this)">
-              <input type="hidden" name="post_id" value="<%= post._id %>">
+              <input type="hidden" id="post_id" name="post_id" value="<%= post._id %>">
               <div class="form-group">
                 <input type="text" name="username" placeholder="username" class="form-control">
               </div>
@@ -59,36 +59,60 @@
         </div>
 
         <script type="text/javascript">
+          const socket = io()
+
           const doComment = form => {
+            const formData = {
+              username: form.username.value,
+              comment: form.comment.value,
+              post_id: form.post_id.value
+            }
+
             $.ajax({
               url: "/do-comment",
               method: "post",
-              data: {
-                username: form.username.value,
-                comment: form.comment.value,
-                post_id: form.post_id.value
-              },
+              data: formData,
               success: res => {
-                alert(res)
+                formData._id = res._id
+
+                socket.emit("new_comment", formData)
+
+                alert(res.text)
               }
             })
 
             return false
           }
+
+          socket.on('new_comment', formData => {
+            if (formData.post_id == $('#post_id').val()) {
+              const html = `<div class="media mb-4">
+              <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+              <div class="media-body">
+              <h5 class="mt-0">${formData.username}</h5>
+              ${formData.comment}
+              </div>
+              </div>`
+
+              $('#comments').prepend(html)
+            }
+          })
         </script>
 
         <!-- Single Comment -->
-        <% if (post.comments) { %>
-          <% post.comments.reverse().forEach(comment => { %>
-            <div class="media mb-4">
-              <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-              <div class="media-body">
-                <h5 class="mt-0"><%= comment.username %></h5>
-                <%= comment.comment %>
+        <div id="comments">
+          <% if (post.comments) { %>
+            <% post.comments.reverse().forEach(comment => { %>
+              <div class="media mb-4">
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                <div class="media-body">
+                  <h5 class="mt-0"><%= comment.username %></h5>
+                  <%= comment.comment %>
+                </div>
               </div>
-            </div>
-          <% }) %>
-        <% } %>
+            <% }) %>
+          <% } %>
+        </div>
 
       </div>
 
