@@ -4,7 +4,12 @@ const Schema = mongoose.Schema
 const postSchema = new Schema({
   title: String,
   content: String,
-  comments: Array,
+  comments: [{
+    username: String,
+    comment: String,
+    email: String,
+    replies: Array
+  }],
   image: String
 })
 

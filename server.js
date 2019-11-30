@@ -98,14 +98,37 @@ app.post("/do-comment", (req, res) => {
   Post.updateOne({_id: req.body.post_id}, {
     $push: {
       "comments": {
+        _id: mongoose.Types.ObjectId(),
         username: req.body.username,
-        comment: req.body.comment
+        comment: req.body.comment,
+        email: req.body.email
       }
     }
   }, (err, docs) => {
     res.send({
       text: "post comment successfully",
       _id: docs.id
+    })
+  })
+})
+
+app.post("/do-reply", (req, res) => {
+  const replyId = mongoose.Types.ObjectId()
+  Post.updateOne({
+    _id: req.body.post_id,
+    "comments._id": req.body.comment_id
+  }, {
+    $push: {
+      "comments.$.replies": {
+        _id: replyId,
+        name: req.body.name,
+        reply: req.body.reply
+      }
+    }
+  }, (err, docs) => {
+    res.send({
+      text: "Replied successfully",
+      _id: replyId
     })
   })
 })

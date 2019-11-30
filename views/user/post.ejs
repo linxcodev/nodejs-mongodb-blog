@@ -51,6 +51,10 @@
               </div>
 
               <div class="form-group">
+                <input type="email" name="email" placeholder="email" class="form-control">
+              </div>
+
+              <div class="form-group">
                 <textarea class="form-control" name="comment" rows="3"></textarea>
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
@@ -65,7 +69,8 @@
             const formData = {
               username: form.username.value,
               comment: form.comment.value,
-              post_id: form.post_id.value
+              post_id: form.post_id.value,
+              email: form.email.value
             }
 
             $.ajax({
@@ -97,6 +102,26 @@
               $('#comments').prepend(html)
             }
           })
+
+          const doReply = form => {
+            const formData = {
+              post_id: form.post_id.value,
+              comment_id: form.comment_id.value,
+              name: form.name.value,
+              reply: form.reply.value
+            }
+
+            $.ajax({
+              url: '/do-reply',
+              method: 'post',
+              data: formData,
+              success: res => {
+                alert(res.text)
+              }
+            })
+
+            return false
+          }
         </script>
 
         <!-- Single Comment -->
@@ -108,6 +133,38 @@
                 <div class="media-body">
                   <h5 class="mt-0"><%= comment.username %></h5>
                   <%= comment.comment %>
+
+                  <% if (comment.replies) { %>
+                    <% comment.replies.reverse().forEach(reply => { %>
+                      <div class="media mb-4">
+                        <img src="http://placehold.it/50x50" class="d-flex mr-3 rounded-circle">
+
+                        <div class="media-body">
+                          <h5 class="mt-0"><%= reply.name %></h5>
+
+                          <%= reply.reply %>
+                        </div>
+                      </div>
+                    <% }) %>
+                  <% } %>
+
+                  <% if (comment._id) { %>
+                    <div class="col-md-3">
+                      <form method="post" onsubmit="return doReply(this)">
+                        <input type="hidden" name="post_id" value="<%= post._id %>">
+                        <input type="hidden" name="comment_id" value="<%= comment._id %>">
+                        <div class="form-group">
+                          <input type="text" name="name" class="form-control" placeholder="Enter name">
+                        </div>
+
+                        <div class="form-group">
+                          <textarea type="text" name="reply" class="form-control" placeholder="Enter reply"></textarea>
+                        </div>
+
+                        <input type="submit" value="Reply" class="btn btn-info btn-sm">
+                      </form>
+                    </div>
+                  <% } %>
                 </div>
               </div>
             <% }) %>
