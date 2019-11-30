@@ -7,7 +7,8 @@ const express = require('express'),
       session = require('express-session'),
       mongoose = require('mongoose'),
       http = require('http').createServer(app),
-      io = require('socket.io')(http)
+      io = require('socket.io')(http),
+      nodemailer = require('nodemailer')
 
 app.use(session({
   key: 'admin',
@@ -126,9 +127,26 @@ app.post("/do-reply", (req, res) => {
       }
     }
   }, (err, docs) => {
-    res.send({
-      text: "Replied successfully",
-      _id: replyId
+    const transporter = nodemailer.createTransport({
+      "service": "gmail",
+      "auth": {
+        "user": "technopreneur37",
+        "pass": "qweasd098"
+      }
+    })
+
+    const mailOption = {
+      "from": "My blog",
+      "to": req.body.comment_email,
+      "subject": "New Reply",
+      "text": `${req.body.name} has replied on your comment http://localhost:3100/post/${req.body.post_id}`
+    }
+
+    transporter.sendMail(mailOption, (err, info) => {
+      res.send({
+        text: "Replied successfully",
+        _id: replyId
+      })
     })
   })
 })
