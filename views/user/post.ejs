@@ -103,6 +103,20 @@
             }
           })
 
+          socket.on('new_reply', formData => {
+            const html = `<div class="media mb-4">
+              <img src="http://placehold.it/50x50" class="d-flex mr-3 rounded-circle">
+
+              <div class="media-body">
+                <h5 class="mt-0">${formData.name}</h5>
+
+                ${formData.reply}
+              </div>
+            </div>`
+
+            $('#replies-'+formData.comment_id).append(html)
+          })
+
           const doReply = form => {
             const formData = {
               post_id: form.post_id.value,
@@ -117,6 +131,12 @@
               method: 'post',
               data: formData,
               success: res => {
+                formData._id = res._id
+                socket.emit('new_reply', formData)
+
+                form.name.value = ""
+                form.reply.value = ""
+
                 alert(res.text)
               }
             })
@@ -135,19 +155,21 @@
                   <h5 class="mt-0"><%= comment.username %></h5>
                   <%= comment.comment %>
 
-                  <% if (comment.replies) { %>
-                    <% comment.replies.reverse().forEach(reply => { %>
-                      <div class="media mb-4">
-                        <img src="http://placehold.it/50x50" class="d-flex mr-3 rounded-circle">
+                  <div id="replies-<%= comment._id %>">
+                    <% if (comment.replies) { %>
+                      <% comment.replies.reverse().forEach(reply => { %>
+                        <div class="media mb-4">
+                          <img src="http://placehold.it/50x50" class="d-flex mr-3 rounded-circle">
 
-                        <div class="media-body">
-                          <h5 class="mt-0"><%= reply.name %></h5>
+                          <div class="media-body">
+                            <h5 class="mt-0"><%= reply.name %></h5>
 
-                          <%= reply.reply %>
+                            <%= reply.reply %>
+                          </div>
                         </div>
-                      </div>
-                    <% }) %>
-                  <% } %>
+                      <% }) %>
+                    <% } %>
+                  </div>
 
                   <% if (comment._id) { %>
                     <div class="col-md-3">

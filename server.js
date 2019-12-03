@@ -127,27 +127,27 @@ app.post("/do-reply", (req, res) => {
       }
     }
   }, (err, docs) => {
-    const transporter = nodemailer.createTransport({
-      "service": "gmail",
-      "auth": {
-        "user": "technopreneur37",
-        "pass": "qweasd098"
-      }
-    })
-
-    const mailOption = {
-      "from": "My blog",
-      "to": req.body.comment_email,
-      "subject": "New Reply",
-      "text": `${req.body.name} has replied on your comment http://localhost:3100/post/${req.body.post_id}`
-    }
-
-    transporter.sendMail(mailOption, (err, info) => {
+    // const transporter = nodemailer.createTransport({
+    //   "service": "gmail",
+    //   "auth": {
+    //     "user": "technopreneur37",
+    //     "pass": "qweasd098"
+    //   }
+    // })
+    //
+    // const mailOption = {
+    //   "from": "My blog",
+    //   "to": req.body.comment_email,
+    //   "subject": "New Reply",
+    //   "text": `${req.body.name} has replied on your comment http://localhost:3100/post/${req.body.post_id}`
+    // }
+    //
+    // transporter.sendMail(mailOption, (err, info) => {
       res.send({
         text: "Replied successfully",
         _id: replyId
       })
-    })
+    // })
   })
 })
 
@@ -171,6 +171,10 @@ io.on('connection', socket => {
 
   socket.on("new_comment", (formData) => {
     io.emit("new_comment", formData)
+  })
+
+  socket.on('new_reply', formData => {
+    io.emit('new_reply', formData)
   })
 })
 
