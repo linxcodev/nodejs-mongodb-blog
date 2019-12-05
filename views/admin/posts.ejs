@@ -19,6 +19,33 @@
 
     <input type="submit" value="Submit" class="btn btn-info">
   </form>
+
+  <table class="table">
+    <tr>
+      <th>Title</th>
+      <th>Content</th>
+      <th>Image</th>
+      <th>Action</th>
+    </tr>
+    <% posts.map(post => { %>
+      <tr>
+        <td><%= post.title %></td>
+        <td><%= post.content %></td>
+        <td>
+          <% if (post.image) { %>
+            <img width="300" src="<%= post.image %>" alt="">
+          <% } else { %>
+            <img width="300" src="http://placehold.it/750x300" alt="">
+          <% } %>
+        </td>
+        <td>
+          <a href="/post/edit/<%= post._id %>" class="btn btn-warning btn-sm">
+            Edit
+          </a>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
 </div>
 
 <script type="text/javascript">

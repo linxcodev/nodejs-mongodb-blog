@@ -53,10 +53,33 @@ app.get('/admin/dashboard', (req, res) => {
 
 app.get('/admin/posts', (req, res) => {
   if (req.session.admin) {
-    res.render("admin/posts")
+    Post.find((err, posts) => {
+      res.render("admin/posts", {posts: posts})
+    })
   } else {
     res.redirect("/admin")
   }
+})
+
+app.get("/post/edit/:id", (req, res) => {
+  if (req.session.admin) {
+    Post.findById(req.params.id, (err, post) => {
+      res.render("admin/edit_post", {post: post})
+    })
+  } else {
+    res.redirect()
+  }
+})
+
+app.post('/do-edit-post', (req, res) => {
+  Post.updateOne({_id: req.body._id}, {
+    $set: {
+      title: req.body.title,
+      content: req.body.content
+    }
+  }, (err, docs) => {
+    res.send("Update successfully!")
+  })
 })
 
 app.post('/do-admin-login', (req, res) => {
