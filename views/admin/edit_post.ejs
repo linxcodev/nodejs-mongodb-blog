@@ -8,6 +8,11 @@
       value="<%= post.title %>">
     </div>
 
+    <!-- Button trigger modal -->
+    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" type="button">
+       Upload image
+    </button>
+
     <div class="form-group">
       <label>Content</label>
       <textarea name="content" class="form-control" placeholder="Content"><%= post.content %></textarea>
@@ -17,12 +22,49 @@
   </form>
 </div>
 
+<div class = "modal fade" id = "myModal" tabindex = "-1" role = "dialog"
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+
+   <div class = "modal-dialog">
+      <div class = "modal-content">
+
+         <div class = "modal-header">
+            <h4 class = "modal-title" id = "myModalLabel">
+               Upload image
+            </h4>
+
+            <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+              &times;
+            </button>
+         </div>
+
+         <div class = "modal-body">
+            <form id="form-upload" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="image" value="<%= post.image %>">
+
+              <div class="form-group">
+                <input type="file" name="file" class="form-control">
+              </div>
+
+              <input type="submit" class="btn btn-success" value="Upload">
+            </form>
+         </div>
+
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+
+</div><!-- /.modal -->
+
 <script type="text/javascript">
 const postId = '<%= post._id %>'
+let image = '<%= post.image %>'
 
 const doEditPost = form => {
-  let formData = {
-    title: form.title.value, content: form.content.value, _id: postId
+  const formData = {
+    title: form.title.value,
+    content: form.content.value,
+    _id: postId,
+    image: image
   }
 
   $.ajax({
@@ -36,6 +78,26 @@ const doEditPost = form => {
 
   return false
 }
+
+$('#form-upload').on('submit', e => {
+  e.preventDefault()
+  let formData = new FormData()
+  formData.append('file', $('input[type=file]')[0].files[0])
+  formData.append('imageOld', image)
+
+  $.ajax({
+    url: "/do-update-image",
+    method: "post",
+    data: formData,
+    contentType: false,
+    cache: false,
+    processData: false,
+    success: res => {
+      image = res
+      $('#myModal').modal('hide')
+    }
+  })
+})
 </script>
 
 <%- include('footer') -%>

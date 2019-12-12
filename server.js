@@ -75,7 +75,8 @@ app.post('/do-edit-post', (req, res) => {
   Post.updateOne({_id: req.body._id}, {
     $set: {
       title: req.body.title,
-      content: req.body.content
+      content: req.body.content,
+      image: req.body.image
     }
   }, (err, docs) => {
     res.send("Update successfully!")
@@ -183,6 +184,21 @@ app.post("/do-upload-image", (req, res) => {
 
     fs.rename(oldPath, newPath, err => {
       res.send("/" + newPath)
+    })
+  })
+})
+
+app.post("/do-update-image", (req, res) => {
+  let formData = new formidable.IncomingForm()
+
+  formData.parse(req, (err, fields, files) => {
+    fs.unlink(fields.imageOld.replace("/", ""), err => {
+      let oldPath = files.file.path
+      let newPath = "static/images/" + files.file.name
+
+      fs.rename(oldPath, newPath, err => {
+        res.send("/" + newPath)
+      })
     })
   })
 })
