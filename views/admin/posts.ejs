@@ -42,6 +42,10 @@
           <a href="/post/edit/<%= post._id %>" class="btn btn-warning btn-sm">
             Edit
           </a>
+          <button type="button" class="btn btn-danger btn-sm" onclick="doDelete(
+          '<%= post._id %>', '<%= post.image %>')">
+            Delete
+          </button>
         </td>
       </tr>
     <% }) %>
@@ -49,6 +53,25 @@
 </div>
 
 <script type="text/javascript">
+  const doDelete = (postId, image) => {
+    if (confirm("Are you sure delete this?")) {
+      $.ajax({
+        url: "/do-delete",
+        method: "post",
+        data: {
+          _id: postId,
+          image
+        },
+        success: res => {
+          const socket = io()
+          socket.emit("delete_post", postId)
+
+          alert(res)
+        }
+      })
+    }
+  }
+
   const doPost = form => {
     let formData = {
       title: form.title.value, content: form.content.value, image: imagePath

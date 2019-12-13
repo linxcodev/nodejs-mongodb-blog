@@ -31,6 +31,20 @@ mongoose.connect('mongodb://localhost:27017/blog', {useNewUrlParser: true})
 let Post = require('./models/post'),
     admin = require('./models/admin')
 
+app.post('/do-delete', (req, res) => {
+  if (req.session.admin) {
+    fs.unlink(req.body.image.replace('/', ''), err => {
+      Post.deleteOne({
+        _id: req.body._id
+      }, (err, doc) => {
+        res.send("Deleted")
+      })
+    })
+  } else {
+    res.redirect("/admin")
+  }
+})
+
 app.get('/', (req, res) => {
   Post.find((err, posts) => {
     res.render("user/home", {posts: posts.reverse()})
@@ -214,6 +228,10 @@ io.on('connection', socket => {
 
   socket.on('new_reply', formData => {
     io.emit('new_reply', formData)
+  })
+
+  socket.on('delete_post', postId => {
+    socket.broadcast.emit('delete_post', postId)
   })
 })
 

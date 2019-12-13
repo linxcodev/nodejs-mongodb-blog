@@ -18,7 +18,7 @@
     <!-- Blog Post -->
     <div id="posts">
       <% posts.forEach(post => { %>
-        <div class="card mb-4">
+        <div class="card mb-4" id="post-<%= post._id %>">
           <div class="card-body">
             <div class="row">
               <div class="col-lg-6">
@@ -54,6 +54,10 @@
 
   <script type="text/javascript">
     let socket = io()
+
+    socket.on("delete_post", postId => {
+      $(`#post-${postId}`).remove()
+    })
 
     socket.on("new_post", formData => {
       let imageUri = (formData.image) ? formData.image : "http://placehold.it/750x300"
