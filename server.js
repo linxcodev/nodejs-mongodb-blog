@@ -29,7 +29,8 @@ mongoose.set('useUnifiedTopology', true)
 mongoose.connect('mongodb://localhost:27017/blog', {useNewUrlParser: true})
 
 let Post = require('./models/post'),
-    admin = require('./models/admin')
+    Admin = require('./models/admin'),
+    Setting = require('./models/setting')
 
 app.post('/do-delete', (req, res) => {
   if (req.session.admin) {
@@ -46,8 +47,25 @@ app.post('/do-delete', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  Post.find((err, posts) => {
-    res.render("user/home", {posts: posts.reverse()})
+  Setting.findOne({}, (err, setting) => {
+    const postLimit = parseInt(setting.post_limit)
+
+    Post.find().sort({
+      _id: -1
+    }).limit(postLimit).exec((err, posts) => {
+      res.render("user/home", {
+        posts: posts,
+        postLimit: postLimit
+      })
+    })
+  })
+})
+
+app.get('/get-posts/:start/:limit', (req, res) => {
+  Post.find().sort({
+    _id: -1
+  }).skip(parseInt(req.params.start)).limit(parseInt(req.params.limit)).exec((err, posts) => {
+    res.send(posts)
   })
 })
 
@@ -98,7 +116,7 @@ app.post('/do-edit-post', (req, res) => {
 })
 
 app.post('/do-admin-login', (req, res) => {
-  admin.findOne({
+  Admin.findOne({
     'email': req.body.email,
     'password': req.body.password
   }, (err, admin) => {
@@ -214,6 +232,22 @@ app.post("/do-update-image", (req, res) => {
         res.send("/" + newPath)
       })
     })
+  })
+})
+
+app.get("/admin/settings", (req, res) => {
+  Setting.findOne({}, (err, setting) => {
+    res.render("admin/settings", {
+      post_limit: setting.post_limit
+    })
+  })
+})
+
+app.post("/admin/save_settings", (req, res) => {
+  Setting.updateOne({}, {
+    post_limit: req.body.post_limit
+  }, {upsert: true}, (err, doc) => {
+    res.redirect('/admin/settings')
   })
 })
 

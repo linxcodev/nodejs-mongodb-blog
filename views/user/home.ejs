@@ -49,10 +49,87 @@
       <% }) %>
     </div>
 
+    <div class="row">
+      <div class="col-md-6">
+        <button type="button" class="btn btn-info" onclick="getPrev()">
+          Prev
+        </button>
+      </div>
+
+      <div class="col-md-6">
+        <button type="button" class="btn btn-info float-right" onclick="getNext()">
+          Next
+        </button>
+      </div>
+    </div>
+
   </div>
   <!-- /.container -->
 
   <script type="text/javascript">
+    let start = 0
+    let limit = '<%= postLimit %>'
+
+    const getNext = () => {
+      start += limit
+
+      $.ajax({
+        url: "/get-posts/" + start + "/" + limit,
+        method: 'get',
+        success: res => {
+          renderPosts(res)
+        }
+      })
+    }
+
+    const getPrev = () => {
+      start -= limit
+
+      $.ajax({
+        url: "/get-posts/" + start + "/" + limit,
+        method: 'get',
+        success: res => {
+          renderPosts(res)
+        }
+      })
+    }
+
+    const renderPosts = posts => {
+      if (posts.length) {
+        let html = ``
+
+        posts.map(post => {
+          let image = (post.image) ? post.image : 'http://placehold.it/750x300'
+          html += `<div class="card mb-4" id="post-${post._id}">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6">
+                  <a href="#">
+                    <img class="img-fluid rounded" src="${image}" alt="">
+                  </a>
+                </div>
+                <div class="col-lg-6">
+                  <h2 class="card-title">
+                    ${post.title}
+                  </h2>
+                  <p class="card-text">
+                    ${post.content}
+                  </p>
+                  <a href="posts/${post._id}" class="btn btn-primary">Read More &rarr;</a>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer text-muted">
+              Posted on January 1, 2017 by
+              <a href="#">Start Bootstrap</a>
+            </div>
+          </div>`
+        })
+
+        $('#posts').html(html)
+      }
+    }
+
     let socket = io()
 
     socket.on("delete_post", postId => {

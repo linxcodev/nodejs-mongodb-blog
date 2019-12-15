@@ -1,0 +1,14 @@
+<%- include('header') -%>
+
+<div class="container">
+  <form action="/admin/save_settings" method="post">
+    <div class="form-group">
+      <label>Post limit</label>
+      <input name="post_limit" class="form-control" value="<%= post_limit %>">
+    </div>
+
+    <input type="submit" class="btn btn-info" value="Save settings">
+  </form>
+</div>
+
+<%- include('footer') -%>
